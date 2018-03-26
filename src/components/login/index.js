@@ -55,7 +55,7 @@ class Login extends Component {
       index: 0,
       actions: [
         NavigationActions.navigate({
-          routeName: 'ShippingList',
+          routeName: 'ShippingInfo',
         })
       ]
     })
