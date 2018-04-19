@@ -13,21 +13,19 @@ export default class Navbar extends Component {
     const { title, left, right } = this.props
     return (
       <Header>
-        {left &&
-          <Left>
-            <Icon name="chevron-left" size={24} color="#FFF" /> 
-          </Left>
-        }
-        {title &&
-          <Body>
-            <Title>{title}</Title>
-          </Body>
-        }
-        {right &&
-          <Right>
+        <Left>
+          {left &&
+            <Icon name="chevron-left" size={24} color="#FFF" />
+          }
+        </Left>
+        <Body>
+          <Title>{title}</Title>
+        </Body>
+        <Right>
+          {right &&
             <Icon name="chevron-left" size={26} color="#FFF" />
-          </Right>
-        }
+          }
+        </Right>
       </Header>
     )
   }
