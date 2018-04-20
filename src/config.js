@@ -27,5 +27,10 @@ export default {
     pickingItems: url + '/api/productWarehouse/picking/items/',
     pickingStart: url + '/api/productWarehouse/picking/start',
     pickingEnd: url + '/api/productWarehouse/picking/end',
+
+    inventoryList: url + '/api/productWarehouse/inventory/list',
+    inventoryItem: url + '/api/productWarehouse/inventory/item/',
+    finished: url + '/api/productWarehouse/inventory/finished/',
+    saveInventory: url + '/api/productWarehouse/inventory/save',
   },
 }

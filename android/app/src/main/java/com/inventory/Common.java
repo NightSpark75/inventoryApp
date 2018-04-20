@@ -1,4 +1,4 @@
-package com.shipping;
+package com.inventory;
 
 import android.app.Activity;
 import android.os.AsyncTask;

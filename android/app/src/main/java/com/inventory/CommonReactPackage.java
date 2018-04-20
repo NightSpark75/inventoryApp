@@ -1,4 +1,4 @@
-package com.shipping;
+package com.inventory;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;

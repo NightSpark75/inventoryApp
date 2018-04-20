@@ -1,4 +1,4 @@
-package com.shipping;
+package com.inventory;
 
 public class datawedge {
 
