@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { AppRegistry, StyleSheet, Alert, View, BackHandler } from 'react-native'
 import { Container, Content, StyleProvider, Header, Left, Body, Button, Title, Text, Icon } from 'native-base'
-import { getPickingInfo, removePicking, confirm, navigationReset } from '../../lib'
+import { confirm, navigationReset } from '../../lib'
 import { withNavigation } from 'react-navigation'
 import getTheme from '../../nativeBase/components'
 import material from '../../nativeBase/variables/material'
@@ -19,7 +19,6 @@ class InventoryEnd extends Component {
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', () => this.cancelInventory())
-    this.getPickingInfo()
   }
 
   componentWillUnmount() {
@@ -42,8 +41,7 @@ class InventoryEnd extends Component {
   }
 
   render() {
-    const { state } = this.props.navigation;
-    const { cyno } = this.state
+    const { cyno } = this.props.navigation.state.params
     return (
       <StyleProvider style={getTheme(material)} >
         <Container>
@@ -58,17 +56,15 @@ class InventoryEnd extends Component {
             </Body>
           </Header>
           <Content style={styles.content}>
-            {ststop !== '' &&
-              <View>
-                <Text style={styles.inventoryInfo}>{'盤點單號:' + cyno}</Text>
-                <Text style={styles.message}>
-                  所有品項已完成，按下按鈕完成盤點...
-                </Text>
-                <Button block primary large onPress={this.inventoryEnd} style={{ margin: 10 }}>
-                  <Text>完成盤點</Text>
-                </Button>
-              </View>
-            }
+            <View>
+              <Text style={styles.inventoryInfo}>{'盤點單號:' + cyno}</Text>
+              <Text style={styles.message}>
+                所有品項已完成，按下按鈕完成盤點...
+              </Text>
+              <Button block primary large onPress={this.inventoryEnd} style={{ margin: 10 }}>
+                <Text>完成盤點</Text>
+              </Button>
+            </View>
           </Content>
         </Container>
       </StyleProvider>

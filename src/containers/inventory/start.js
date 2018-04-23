@@ -45,7 +45,7 @@ class InventoryStart extends Component {
     const { cyno } = this.props.navigation.state.params
     this.props.navigation.state.params.unlock()
     const params = { cyno: cyno }
-    navigationGo(this, 'inventoryItems', params)
+    navigationGo(this, 'InventoryItems', params)
   }
 
   render() {
@@ -88,5 +88,5 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNavigation(PickingStart)
-AppRegistry.registerComponent('PickingStart', () => PickingStart)
+export default withNavigation(InventoryStart)
+AppRegistry.registerComponent('InventoryStart', () => InventoryStart)

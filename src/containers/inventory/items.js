@@ -1,9 +1,7 @@
 'use strict'
 import React, { Component } from 'react'
-import Realm from 'realm'
-import { itemsRealm, pickingRealm } from '../../realm/schema'
 import { withNavigation } from 'react-navigation'
-import { AppRegistry, StyleSheet, NativeModules, DeviceEventEmitter, BackHandler } from 'react-native'
+import { AppRegistry, StyleSheet, NativeModules, DeviceEventEmitter, BackHandler, View } from 'react-native'
 import {
   Container,
   Content,
@@ -21,15 +19,11 @@ import {
 } from 'native-base'
 import {
   toast,
-  getAllItems,
-  removePicking,
-  picked,
-  checkFinished,
   confirm,
   navigationReset,
   navigationGo,
 } from '../../lib'
-import { checkFinished, saveInventory } from '../../api'
+import { checkFinished, saveInventory, getInventoryItem } from '../../api'
 import getTheme from '../../nativeBase/components'
 import material from '../../nativeBase/variables/material'
 
@@ -82,9 +76,15 @@ class InventoryItems extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      item: null,
+      item: {},
       scanIndex: 0,
+      saving: false,
     }
+    this.getItem = this.getItem.bind(this)
+    this.enabledScanModel = this.enabledScanModel.bind(this)
+    this.disabledScanModel = this.disabledScanModel.bind(this)
+    this.goInventoryEnd = this.goInventoryEnd.bind(this)
+    this.onScanBarcode = this.onScanBarcode.bind(this)
     this.cancelInventory = this.cancelInventory.bind(this)
     this.amountChange = this.amountChange.bind(this)
     this.save = this.save.bind(this)
@@ -92,33 +92,51 @@ class InventoryItems extends Component {
   }
 
   componentDidMount() {
-    let items = getAllItems()
-    this.setState({ items: items }, () => {
-      this.checkFinished()
-      BackHandler.addEventListener('hardwareBackPress', () => this.cancelInventory())
-      DeviceEventEmitter.addListener('onScanBarcode', this.onScanBarcode.bind(this))
-      DeviceEventEmitter.addListener('onRefreshMessage', (msg) => toast(msg))
-      ScanModule.enabledScan()
-    })
+    this.getItem()
   }
 
-  componentWillUnmount() {
+  getItem() {
+    const { cyno } = this.props.navigation.state.params
+    const success = (res) => {
+      this.setState({item: res.data}, () => this.enabledScanModel())
+    }
+    const error = (err) => {
+      alert(err.response.data.msg)
+    }
+    getInventoryItem(cyno, success, error)
+  }
+
+  enabledScanModel() {
+    this.checkFinished()
+    BackHandler.addEventListener('hardwareBackPress', () => this.cancelInventory())
+    DeviceEventEmitter.addListener('onScanBarcode', (code) => this.onScanBarcode(code))
+    DeviceEventEmitter.addListener('onRefreshMessage', (msg) => toast(msg))
+    ScanModule.enabledScan()
+  }
+
+  disabledScanModel() {
     BackHandler.removeEventListener('hardwareBackPress')
     DeviceEventEmitter.removeListener('onScanBarcode')
     DeviceEventEmitter.removeListener('onRefreshMessage')
     ScanModule.disabledScan()
   }
 
+  componentWillUnmount() {
+    this.disabledScanModel()
+  }
+
   onScanBarcode(code) {
-    let index = scanIndex%3
-    this.setState({scanIndex: index++})
-    // const { scanIndex, item } = this.state
-    // const index = scanIndex%3
-    // if (code === item[scanColumn[index]]) {
-    //   this.setState({scanIndex: index++})
-    // } else {
-    //   this.setState({ message: msgOption[index] + '錯誤(' + code + ')' })
-    // }
+    const { scanIndex, item } = this.state
+    let index = scanIndex%4
+    if (code === item[scanColumn[index]]) {
+      index++
+      this.setState({
+        scanIndex: index,
+        message: '',
+      })
+    } else {
+      this.setState({ message: msgOption[index] + '錯誤(' + code + ')' })
+    }
   }
 
   amountChange(e) {
@@ -142,30 +160,30 @@ class InventoryItems extends Component {
   save() {
     const { item } = this.state
     const { cyno } = this.props.navigation.state.params
+    this.setState({saving: true})
     const success = (res) => {
-      if (res.data !== null) {
-        this.setState({item: res.data})
+      if (Object.keys(res.data).length > 0) {
+        this.setState({
+          saving: false,
+          scanIndex: 0,
+          item: res.data
+        })
       } else {
-        const params = {
-          cyno: cyno,
-        }
-        navigationGo(this, 'inventoryEnd', params)
+        this.goInventoryEnd()
       }
     }
     const error = (err) => {
       alert(err.response.data.msg)
+      this.setState({saving: false})
     }
-    saveInventory(item)
+    saveInventory(item, success, error)
   }
 
   checkFinished() {
     const { cyno } = this.props.navigation.state.params
     const success = (res) => {
       if (res.data) {
-        const params = {
-          cyno: cyno,
-        }
-        navigationGo(this, 'inventoryEnd', params)
+        this.goInventoryEnd()
       }
     }
     const error = (err) => {
@@ -174,11 +192,20 @@ class InventoryItems extends Component {
     checkFinished(cyno, success, error)
   }
 
+  goInventoryEnd() {
+    const { cyno } = this.props.navigation.state.params
+    this.disabledScanModel()
+    const params = {
+      cyno: cyno,
+    }
+    navigationGo(this, 'InventoryEnd', params)
+  }
+
   render() {
-    const { item, scanIndex, message } = this.state
+    const { item, scanIndex, message, saving } = this.state
     return (
       <StyleProvider style={getTheme(material)} >
-        {pickValue.length === 0 ?
+        {item === null ?
           <Container>
             <Header>
               <Left>
@@ -209,17 +236,20 @@ class InventoryItems extends Component {
               </Body>
             </Header>
             <Content style={styles.content}>
-              <Text style={scanIndex === 0 ? styles.scanInfoSuccess : styles.scanInfo}>{'儲位: ' + item.locn.trim()}</Text>
-              <Text style={scanIndex === 1 ? styles.scanInfoSuccess : styles.scanInfo}>{'料號: ' + item.litm.trim()}</Text>
-              <Text style={scanIndex === 2 ? styles.scanInfoSuccess : styles.scanInfo}>{'批號: ' + item.lotn.trim()}</Text>
-              <Text style={styles.InventoryInfo}>{'盤點數量: ' + item.tqoh + ' ' + item.uom1.trim()}</Text>
-              {style.content === 2 &&
+              {Object.keys(item).length > 0 &&
+              <View>
+                <Text style={scanIndex > 0 ? styles.scanInfoSuccess : styles.scanInfo}>{'儲位: ' + item.locn.trim()}</Text>
+                <Text style={scanIndex > 1 ? styles.scanInfoSuccess : styles.scanInfo}>{'料號: ' + item.litm.trim()}</Text>
+                <Text style={scanIndex > 2 ? styles.scanInfoSuccess : styles.scanInfo}>{'批號: ' + item.lotn.trim()}</Text>
+                <Text style={styles.InventoryInfo}>{'盤點數量: ' + item.tqoh + ' ' + item.uom1.trim()}</Text>
+              </View>
+              }
+              {scanIndex === 3 &&
                 <Item floatingLabel>
                   <Label>輸入盤點數量</Label>
                   <Input
                     keyboardType="numeric"
                     onChange={this.amountChange}
-                    autoFocus={true}
                     value={item.amount}
                   />
                 </Item>
@@ -227,9 +257,14 @@ class InventoryItems extends Component {
               {message !== '' &&
                 <Text style={styles.message}>{message}</Text>
               }
-              {style.content === 2 &&
+              {scanIndex === 3 && !saving &&
                 <Button block primary large onPress={this.save}>
                   <Text>確認</Text>
+                </Button>
+              }
+              {scanIndex === 3 && saving &&
+                <Button block primary large disabled={true}>
+                  <Text>處理中...</Text>
                 </Button>
               }
             </Content>

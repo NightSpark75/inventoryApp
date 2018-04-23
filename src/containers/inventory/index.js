@@ -24,11 +24,12 @@ class Inventory extends Component {
       refreshing: false,
       inventoryList: [],
       vs: ds.cloneWithRows([]),
-    };
+    }
+    this.onRefresh = this.onRefresh.bind(this)
   }
 
   componentDidMount() {
-    this.setState({ refreshing: true })
+    this.setState({ refreshing: true }, () => this.onRefresh())
   }
 
   getInventoryList() {
@@ -68,12 +69,12 @@ class Inventory extends Component {
   onRefresh() {
     this.setState({
       refreshing: true,
-      pickingList: [],
+      inventoryList: [],
     }, () => this.getInventoryList())
   }
 
   render() {
-    const { pickingList, message } = this.state
+    const { inventoryList, message } = this.state
     return (
       <StyleProvider style={getTheme(material)}>
         <Drawer
@@ -96,11 +97,16 @@ class Inventory extends Component {
               refreshControl={
                 <RefreshControl
                   refreshing={this.state.refreshing}
-                  onRefresh={this.onRefresh.bind(this)}
+                  onRefresh={this.onRefresh}
                   colors={['red', 'orange']}
                 />
               }
             >
+              {inventoryList.length === 0 && !this.state.refreshing &&
+                <View>
+                  <Text style={styles.inventoryInfo}>目前沒有盤點資料...</Text>
+                </View>
+              }
               <ListView
                 enableEmptySections={true}
                 style={styles.listView}
@@ -111,7 +117,7 @@ class Inventory extends Component {
                     onPress={this.goInventoryStart.bind(this, rowData.cyno)}
                   >
                     <Text
-                      style={rowData.stky2 !== null ? styles.listItems : styles.listItemsWar}
+                      style={styles.listItems}
                     >
                       {'盤點單號:' + rowData.cyno}
                     </Text>
@@ -148,6 +154,10 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     color: '#F75000',
     padding: 10
+  },
+  inventoryInfo: {
+    padding: 20,
+    fontSize: 26,
   },
 })
 

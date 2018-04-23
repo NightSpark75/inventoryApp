@@ -1,3 +1,3 @@
 export * from './common'
 export * from './login'
-export * from './picking'
+export * from './inventory'

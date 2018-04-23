@@ -19,7 +19,7 @@ export function getInventoryItem(cyno, success, error) {
   axios.get(config.route.inventoryItem + cyno, { headers: { Authorization: Auth } })
   .then((res) => {
     success(res)
-  }).catch((error) => {
+  }).catch((err) => {
     error(err)
   })
 }
@@ -30,7 +30,7 @@ export function checkFinished(cyno, success, error) {
   axios.get(config.route.finished + cyno, { headers: { Authorization: Auth } })
   .then((res) => {
     success(res)
-  }).catch((error) => {
+  }).catch((err) => {
     error(err)
   })
 }

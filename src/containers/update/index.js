@@ -111,7 +111,7 @@ class Update extends Component {
 
   goLogin() {
     const { login } = this.state
-    let route = login ? 'PickingList': 'Login'
+    let route = login ? 'InventoryList': 'Login'
     navigationReset(this, route)
   }
 

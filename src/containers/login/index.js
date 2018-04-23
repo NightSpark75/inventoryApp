@@ -50,7 +50,7 @@ class Login extends Component {
   }
 
   loginSuccess() {
-    navigationReset(this, 'PickingList')
+    navigationReset(this, 'InventoryList')
   }
 
   render() {

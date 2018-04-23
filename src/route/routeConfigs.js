@@ -3,10 +3,10 @@ import Update from '../containers/update'
 import Login from '../containers/login'
 import Sample from '../containers/sample'
 import SampleDetail from '../containers/sample/detail'
-import PickingList from '../containers/picking/index'
-import PickingItems from '../containers/picking/items'
-import PickingStart from '../containers/picking/start'
-import PickingEnd from '../containers/picking/end'
+import InventoryList from '../containers/inventory/index'
+import InventoryItems from '../containers/inventory/items'
+import InventoryStart from '../containers/inventory/start'
+import InventoryEnd from '../containers/inventory/end'
 
 export default {
   Scan: {
@@ -44,29 +44,29 @@ export default {
       headerBackTitle: null,
     }),
   },
-  PickingList: {
-    screen: PickingList,
+  InventoryList: {
+    screen: InventoryList,
     navigationOptions: ({ navigation }) => ({
       header: null,
       headerBackTitle: null,
     })
   },
-  PickingItems: {
-    screen: PickingItems,
+  InventoryItems: {
+    screen: InventoryItems,
     navigationOptions: ({ navigation }) => ({
       header: null,
       headerBackTitle: null,
     })
   },
-  PickingStart: {
-    screen: PickingStart,
+  InventoryStart: {
+    screen: InventoryStart,
     navigationOptions: ({ navigation }) => ({
       header: null,
       headerBackTitle: null,
     })
   },
-  PickingEnd: {
-    screen: PickingEnd,
+  InventoryEnd: {
+    screen: InventoryEnd,
     navigationOptions: ({ navigation }) => ({
       header: null,
       headerBackTitle: null,
