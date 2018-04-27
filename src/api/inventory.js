@@ -24,6 +24,45 @@ export function getInventoryItem(cyno, success, error) {
   })
 }
 
+export function inventoryStart(cyno, success, error) {
+  let token = loadToken()
+  let formData = new FormData()
+  formData.append('cyno', cyno)
+  const Auth = 'Bearer ' + token
+  axios.post(config.route.inventoryStart, formData, { headers: { Authorization: Auth } })
+  .then((res) => {
+    success(res)
+  }).catch((err) => {
+    error(err)
+  }) 
+}
+
+export function inventoryPause(cyno, success, error) {
+  let token = loadToken()
+  let formData = new FormData()
+  formData.append('cyno', cyno)
+  const Auth = 'Bearer ' + token
+  axios.post(config.route.inventoryPause, formData, { headers: { Authorization: Auth } })
+  .then((res) => {
+    success(res)
+  }).catch((err) => {
+    error(err)
+  }) 
+}
+
+export function inventoryEnd(cyno, success, error) {
+  let token = loadToken()
+  let formData = new FormData()
+  formData.append('cyno', cyno)
+  const Auth = 'Bearer ' + token
+  axios.post(config.route.inventoryEnd, formData, { headers: { Authorization: Auth } })
+  .then((res) => {
+    success(res)
+  }).catch((err) => {
+    error(err)
+  }) 
+}
+
 export function checkFinished(cyno, success, error) {
   let token = loadToken()
   const Auth = 'Bearer ' + token

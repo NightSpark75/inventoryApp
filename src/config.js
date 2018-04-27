@@ -2,7 +2,7 @@ const app_name = 'inventoryApp'
 const app_number = '205'
 const major = '000'
 const minor = '01'
-const build = '01'
+const build = '03'
 const protocol = 'http'
 const host = '172.17.100.51'
 const url = protocol + '://' + host
@@ -32,5 +32,8 @@ export default {
     inventoryItem: url + '/api/productWarehouse/inventory/item/',
     finished: url + '/api/productWarehouse/inventory/finished/',
     saveInventory: url + '/api/productWarehouse/inventory/save',
+    inventoryStart: url + '/api/productWarehouse/inventory/start',
+    inventoryPause: url + '/api/productWarehouse/inventory/pause',
+    inventoryEnd: url + '/api/productWarehouse/inventory/end',
   },
 }

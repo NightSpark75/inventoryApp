@@ -6,11 +6,13 @@ import { confirm, navigationReset } from '../../lib'
 import { withNavigation } from 'react-navigation'
 import getTheme from '../../nativeBase/components'
 import material from '../../nativeBase/variables/material'
+import { inventoryEnd } from '../../api'
 
 class InventoryEnd extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isSubmiting: false,
     }
     this.goBackInventory = this.goBackInventory.bind(this)
     this.inventoryEnd = this.inventoryEnd.bind(this)
@@ -37,19 +39,29 @@ class InventoryEnd extends Component {
   }
 
   inventoryEnd() {
-    this.goBackInventory()
+    const { cyno } = this.props.navigation.state.params
+    this.setState({isSubmiting: true})
+    const success = (res) => {
+      this.goBackInventory()
+    }
+    const error = (err) => {
+      this.setState({isSubmiting: false})
+      alert(err.response.data.message)
+    }
+    inventoryEnd(cyno, success, error)
   }
 
   render() {
     const { cyno } = this.props.navigation.state.params
+    const { isSubmiting } = this.state
     return (
       <StyleProvider style={getTheme(material)} >
         <Container>
           <Header>
             <Left>
-              <Button transparent onPress={this.cancelInventory} style={{ width: 50 }}>
+              {/*<Button transparent onPress={this.cancelInventory} style={{ width: 50 }}>
                 <Icon name='md-close' />
-              </Button>
+              </Button>*/}
             </Left>
             <Body>
               <Title>完成盤點</Title>
@@ -61,9 +73,15 @@ class InventoryEnd extends Component {
               <Text style={styles.message}>
                 所有品項已完成，按下按鈕完成盤點...
               </Text>
-              <Button block primary large onPress={this.inventoryEnd} style={{ margin: 10 }}>
-                <Text>完成盤點</Text>
-              </Button>
+              {isSubmiting ?
+                <Button block disabled large style={{ margin: 10 }}>
+                  <Text>處理中...</Text>
+                </Button>
+              :
+                <Button block primary large onPress={this.inventoryEnd} style={{ margin: 10 }}>
+                  <Text>完成盤點</Text>
+                </Button>
+              }
             </View>
           </Content>
         </Container>

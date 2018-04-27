@@ -34,11 +34,15 @@ class Inventory extends Component {
 
   getInventoryList() {
     const success = (res) => {
-      this.setState({
-        inventoryList: res.data,
-        refreshing: false,
-        vs: ds.cloneWithRows(res.data)
-      })
+      if (res.data.current === null) {
+        this.setState({
+          inventoryList: res.data.list,
+          refreshing: false,
+          vs: ds.cloneWithRows(res.data.list)
+        })
+      } else {
+        this.goCurrentInventory(res.data.current.pjcyno)
+      }
     }
     const error = (err) => {
       alert(err)
@@ -56,6 +60,12 @@ class Inventory extends Component {
       this.props.closeDrawer
       navigationGo(this, 'InventoryStart', params)
     }
+  }
+
+  goCurrentInventory(cyno) {
+    const params = { cyno: cyno }
+    this.props.closeDrawer
+    navigationGo(this, 'InventoryItems', params)
   }
 
   closeDrawer = () => {
@@ -103,8 +113,10 @@ class Inventory extends Component {
               }
             >
               {inventoryList.length === 0 && !this.state.refreshing &&
-                <View>
-                  <Text style={styles.inventoryInfo}>目前沒有盤點資料...</Text>
+                <View style={{ alignItems: 'center', }}>
+                  <Text style={{ fontSize: 24 }}>
+                    目前沒有盤點資料...
+                  </Text>
                 </View>
               }
               <ListView
@@ -154,10 +166,6 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     color: '#F75000',
     padding: 10
-  },
-  inventoryInfo: {
-    padding: 20,
-    fontSize: 26,
   },
 })
 

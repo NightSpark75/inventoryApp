@@ -23,7 +23,7 @@ import {
   navigationReset,
   navigationGo,
 } from '../../lib'
-import { checkFinished, saveInventory, getInventoryItem } from '../../api'
+import { checkFinished, saveInventory, getInventoryItem, inventoryPause } from '../../api'
 import getTheme from '../../nativeBase/components'
 import material from '../../nativeBase/variables/material'
 
@@ -101,7 +101,7 @@ class InventoryItems extends Component {
       this.setState({item: res.data}, () => this.enabledScanModel())
     }
     const error = (err) => {
-      alert(err.response.data.msg)
+      alert(err.response.data.message)
     }
     getInventoryItem(cyno, success, error)
   }
@@ -128,12 +128,13 @@ class InventoryItems extends Component {
   onScanBarcode(code) {
     const { scanIndex, item } = this.state
     let index = scanIndex%4
-    if (code === item[scanColumn[index]]) {
-      index++
-      this.setState({
-        scanIndex: index,
-        message: '',
-      })
+    if (index >= 3) return
+      if (code === item[scanColumn[index]]) {
+        index++
+        this.setState({
+          scanIndex: index,
+          message: '',
+        })
     } else {
       this.setState({ message: msgOption[index] + '錯誤(' + code + ')' })
     }
@@ -143,7 +144,7 @@ class InventoryItems extends Component {
     const amount = e.target.value
     let item = this.state.item
     item.amount = amount
-    ths.state({item: item})
+    this.state({item: item})
   }
 
   cancelInventory() {
@@ -154,7 +155,14 @@ class InventoryItems extends Component {
   }
 
   goBackInventory() {
-    navigationReset(this, 'InventoryList')
+    const { cyno } = this.props.navigation.state.params
+    const success = (res) => {
+      navigationReset(this, 'InventoryList')
+    }
+    const error = (err) => {
+      alert(err.response.data.message)
+    }
+    inventoryPause(cyno, success, error)
   }
 
   save() {
@@ -173,7 +181,7 @@ class InventoryItems extends Component {
       }
     }
     const error = (err) => {
-      alert(err.response.data.msg)
+      alert(err.response.data.message)
       this.setState({saving: false})
     }
     saveInventory(item, success, error)
@@ -187,7 +195,7 @@ class InventoryItems extends Component {
       }
     }
     const error = (err) => {
-      alert(err.response.data.msg)
+      alert(err.response.data.message)
     }
     checkFinished(cyno, success, error)
   }
@@ -209,11 +217,9 @@ class InventoryItems extends Component {
           <Container>
             <Header>
               <Left>
-                {/*
                 <Button transparent onPress={this.cancelPicking.bind(this)} style={{ width: 50 }}>
-                  <Icon name='md-close' />
+                  <Icon name='md-pause' />
                 </Button>
-                */}
               </Left>
               <Body>
                 <Title style={{ width: 100 }}>盤點作業</Title>
@@ -228,7 +234,7 @@ class InventoryItems extends Component {
             <Header>
               <Left>
                 <Button transparent onPress={this.cancelInventory} style={{ width: 50 }}>
-                  <Icon name='md-close' />
+                  <Icon name='md-pause' />
                 </Button>
               </Left>
               <Body>
@@ -237,12 +243,12 @@ class InventoryItems extends Component {
             </Header>
             <Content style={styles.content}>
               {Object.keys(item).length > 0 &&
-              <View>
-                <Text style={scanIndex > 0 ? styles.scanInfoSuccess : styles.scanInfo}>{'儲位: ' + item.locn.trim()}</Text>
-                <Text style={scanIndex > 1 ? styles.scanInfoSuccess : styles.scanInfo}>{'料號: ' + item.litm.trim()}</Text>
-                <Text style={scanIndex > 2 ? styles.scanInfoSuccess : styles.scanInfo}>{'批號: ' + item.lotn.trim()}</Text>
-                <Text style={styles.InventoryInfo}>{'盤點數量: ' + item.tqoh + ' ' + item.uom1.trim()}</Text>
-              </View>
+                <View>
+                  <Text style={scanIndex > 0 ? styles.scanInfoSuccess : styles.scanInfo}>{'儲位: ' + item.locn.trim()}</Text>
+                  <Text style={scanIndex > 1 ? styles.scanInfoSuccess : styles.scanInfo}>{'料號: ' + item.litm.trim()}</Text>
+                  <Text style={scanIndex > 2 ? styles.scanInfoSuccess : styles.scanInfo}>{'批號: ' + item.lotn.trim()}</Text>
+                  <Text style={styles.InventoryInfo}>{'盤點數量: ' + item.tqoh + ' ' + item.uom1.trim()}</Text>
+                </View>
               }
               {scanIndex === 3 &&
                 <Item floatingLabel>

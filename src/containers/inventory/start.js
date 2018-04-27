@@ -15,6 +15,7 @@ import {
 } from 'native-base'
 import { withNavigation } from 'react-navigation'
 import { navigationGo } from '../../lib'
+import { inventoryStart } from '../../api'
 import getTheme from '../../nativeBase/components'
 import material from '../../nativeBase/variables/material'
 
@@ -25,6 +26,7 @@ class InventoryStart extends Component {
 
     this.goBack = this.goBack.bind(this)
     this.goItems = this.goItems.bind(this)
+    this.inventoryStart = this.inventoryStart.bind(this)
   }
 
   componentDidMount() {
@@ -41,6 +43,19 @@ class InventoryStart extends Component {
     return true
   }
 
+  inventoryStart() {
+    const cyno = this.props.navigation.state.params.cyno
+    this.setState({ isSubmiting: true })
+    const success = () => {
+      this.goItems()
+    }
+    const error = (err) => {
+      alert(err.response.data.message)
+      this.setState({ isSubmiting: false })
+    }
+    inventoryStart(cyno, success, error)
+  }
+
   goItems() {
     const { cyno } = this.props.navigation.state.params
     this.props.navigation.state.params.unlock()
@@ -50,6 +65,7 @@ class InventoryStart extends Component {
 
   render() {
     const { cyno } = this.props.navigation.state.params
+    const { isSubmiting } = this.state
     return (
       <StyleProvider style={getTheme(material)} >
         <Container>
@@ -65,9 +81,15 @@ class InventoryStart extends Component {
           </Header>
           <Content style={styles.content}>
             <Text style={styles.inventoryInfo}>{'盤點單號:' + cyno}</Text>
-            <Button block primary large onPress={this.goItems} style={{ margin: 10 }}>
-              <Text>開始盤點</Text>
-            </Button>
+            {isSubmiting ?
+              <Button block large disabled style={{ margin: 10 }}>
+                <Text>處理中...</Text>
+              </Button>
+            :
+              <Button block primary large onPress={this.inventoryStart} style={{ margin: 10 }}>
+                <Text>開始盤點</Text>
+              </Button>
+            }
           </Content>
         </Container>
       </StyleProvider>
