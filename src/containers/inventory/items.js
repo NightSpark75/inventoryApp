@@ -141,10 +141,10 @@ class InventoryItems extends Component {
   }
 
   amountChange(e) {
-    const amount = e.target.value
+    const amount = e.nativeEvent.text
     let item = this.state.item
     item.amount = amount
-    this.state({item: item})
+    this.setState({item: item})
   }
 
   cancelInventory() {
@@ -244,10 +244,11 @@ class InventoryItems extends Component {
             <Content style={styles.content}>
               {Object.keys(item).length > 0 &&
                 <View>
-                  <Text style={scanIndex > 0 ? styles.scanInfoSuccess : styles.scanInfo}>{'儲位: ' + item.locn.trim()}</Text>
-                  <Text style={scanIndex > 1 ? styles.scanInfoSuccess : styles.scanInfo}>{'料號: ' + item.litm.trim()}</Text>
-                  <Text style={scanIndex > 2 ? styles.scanInfoSuccess : styles.scanInfo}>{'批號: ' + item.lotn.trim()}</Text>
-                  <Text style={styles.InventoryInfo}>{'盤點數量: ' + (item.tqoh / 10000) + ' ' + item.uom1.trim()}</Text>
+                  <Text style={scanIndex > 0 ? styles.scanInfoSuccess : styles.scanInfo}>{'儲位: ' + item.locn}</Text>
+                  <Text style={scanIndex > 1 ? styles.scanInfoSuccess : styles.scanInfo}>{'料號: ' + item.litm}</Text>
+                  <Text style={scanIndex > 2 ? styles.scanInfoSuccess : styles.scanInfo}>{'批號: ' + item.lotn}</Text>
+                  <Text style={styles.InventoryInfo}>{'盤點數量: ' + (Number(item.tqoh) / 10000) + ' ' + item.uom1}</Text>
+                  {shwoDetail(Number(item.tqoh) / 10000, item.tag1, item.tag2, item.tag3)}
                 </View>
               }
               {scanIndex === 3 &&
@@ -279,6 +280,35 @@ class InventoryItems extends Component {
       </StyleProvider>
     )
   }
+}
+
+function shwoDetail(tqoh, tag1, tag2, tag3) {
+  tqoh = Number(tqoh)
+  let t1 = Number(tag1)
+  let t2 = Number(tag2) * t1
+  let t3 = Number(tag3) * t2
+  let b1, b2, b3, msg
+  if (t3 > 0) {
+    b3 = Math.floor(tqoh / t3) 
+    tqoh = tqoh % t3
+    b2 = Math.floor(tqoh / t2)
+    tqoh = tqoh % t2
+    b1 = Math.floor(tqoh / t1)
+    msg = b3 + '箱' + b2 + '盒又' + b1
+  } else if (t2 > 0) {
+    b2 = Math.floor(tqoh / t2)
+    tqoh = tqoh % t2
+    b1 = Math.floor(tqoh / t1)
+    msg = b2 + '盒又' + b1
+  } else if (t1 > 0) {
+    b1 = Math.floor(tqoh / t1)
+    msg = b1 + '銷售包裝'
+  } else {
+    msg = '--'
+  }
+  return (
+    <Text style={styles.InventoryInfo}>{'盤點數量: ' + msg}</Text>
+  )
 }
 
 export default withNavigation(InventoryItems)
