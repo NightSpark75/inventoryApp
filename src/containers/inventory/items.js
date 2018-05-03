@@ -247,7 +247,7 @@ class InventoryItems extends Component {
                   <Text style={scanIndex > 0 ? styles.scanInfoSuccess : styles.scanInfo}>{'儲位: ' + item.locn.trim()}</Text>
                   <Text style={scanIndex > 1 ? styles.scanInfoSuccess : styles.scanInfo}>{'料號: ' + item.litm.trim()}</Text>
                   <Text style={scanIndex > 2 ? styles.scanInfoSuccess : styles.scanInfo}>{'批號: ' + item.lotn.trim()}</Text>
-                  <Text style={styles.InventoryInfo}>{'盤點數量: ' + item.tqoh + ' ' + item.uom1.trim()}</Text>
+                  <Text style={styles.InventoryInfo}>{'盤點數量: ' + (item.tqoh / 10000) + ' ' + item.uom1.trim()}</Text>
                 </View>
               }
               {scanIndex === 3 &&
