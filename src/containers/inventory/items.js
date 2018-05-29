@@ -130,7 +130,7 @@ class InventoryItems extends Component {
     let index = scanIndex%4
     if (index >= 3) return
       if (code === item[scanColumn[index]]) {
-        index++
+      index++
         this.setState({
           scanIndex: index,
           message: '',
@@ -238,7 +238,7 @@ class InventoryItems extends Component {
                 </Button>
               </Left>
               <Body>
-                <Title style={{ width: 100 }}>揀貨作業</Title>
+                <Title style={{ width: 100 }}>盤點作業</Title>
               </Body>
             </Header>
             <Content style={styles.content}>
@@ -265,7 +265,7 @@ class InventoryItems extends Component {
                 <Text style={styles.message}>{message}</Text>
               }
               {scanIndex === 3 && !saving &&
-                <Button block primary large onPress={this.save}>
+                <Button block primary large onPress={this.save} style={{marginTop: 40}}>
                   <Text>確認</Text>
                 </Button>
               }
